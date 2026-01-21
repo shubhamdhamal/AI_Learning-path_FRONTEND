@@ -9,6 +9,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -76,7 +77,11 @@ export default function LoginScreen({ navigation }) {
           {/* Header */}
           <FadeInView delay={100} duration={800} style={styles.header}>
             <View style={styles.logoContainer}>
-              <Ionicons name="sparkles" size={40} color={Colors.primary.main} />
+              <Image
+                source={require('../../assets/AI_Learning_logo.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
             </View>
             <Text style={styles.title}>AI Learning Path</Text>
             <Text style={styles.subtitle}>
@@ -203,13 +208,18 @@ const createStyles = (Colors, isDarkMode) => StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.8)',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: Spacing.md,
+    overflow: 'hidden',
+  },
+  logo: {
+    width: 80,
+    height: 80,
   },
   title: {
     fontSize: Typography.fontSizes['3xl'],

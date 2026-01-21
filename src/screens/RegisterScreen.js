@@ -9,6 +9,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -91,8 +92,12 @@ export default function RegisterScreen({ navigation }) {
 
           {/* Header */}
           <FadeInView delay={200} duration={800} style={styles.header}>
-            <View style={styles.iconContainer}>
-              <Ionicons name="person-add" size={40} color={Colors.primary.main} />
+            <View style={styles.logoContainer}>
+              <Image
+                source={require('../../assets/AI_Learning_logo.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
             </View>
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>
@@ -245,14 +250,19 @@ const createStyles = (Colors, isDarkMode) => StyleSheet.create({
     alignItems: 'center',
     marginBottom: Spacing.xl,
   },
-  iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.8)',
+  logoContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: Spacing.md,
+    overflow: 'hidden',
+  },
+  logo: {
+    width: 80,
+    height: 80,
   },
   title: {
     fontSize: Typography.fontSizes['2xl'],

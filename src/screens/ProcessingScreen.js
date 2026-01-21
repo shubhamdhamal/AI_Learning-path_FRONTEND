@@ -28,6 +28,7 @@ export default function ProcessingScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { colors: Colors, isDarkMode } = useTheme();
+  const styles = useMemo(() => createStyles(Colors, isDarkMode), [Colors, isDarkMode]);
 
   const { taskId } = route.params || {};
   const { pollStatus, taskStatus, error, resetGeneration } = useLearningPathStore();
@@ -122,8 +123,8 @@ export default function ProcessingScreen() {
       <ScreenWrapper>
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle" size={80} color={Colors.status.error} />
-          <Text style={[styles.errorTitle, { color: Colors.text.primary }]}>Generation Failed</Text>
-          <Text style={[styles.errorMessage, { color: Colors.text.secondary }]}>{error}</Text>
+          <Text style={styles.errorTitle}>Generation Failed</Text>
+          <Text style={styles.errorMessage}>{error}</Text>
           <ModernButton
             title="Try Again"
             onPress={handleCancel}
@@ -143,23 +144,22 @@ export default function ProcessingScreen() {
             style={[
               styles.spinningIcon,
               {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
                 transform: [{ rotate: spin }, { scale: pulseAnimation }]
               },
             ]}
           >
-            <Ionicons name="sparkles" size={60} color={Colors.text.primary} />
+            <Ionicons name="sparkles" size={60} color={Colors.primary.main} />
           </Animated.View>
         </View>
 
         {/* Title */}
-        <Text style={[styles.title, { color: Colors.text.primary }]}>Generating Your Learning Path</Text>
-        <Text style={[styles.subtitle, { color: Colors.text.secondary }]}>
+        <Text style={styles.title}>Generating Your Learning Path</Text>
+        <Text style={styles.subtitle}>
           Our AI is crafting a personalized path just for you
         </Text>
 
         {/* Progress Steps */}
-        <ModernCard style={styles.stepsContainer}>
+        <View style={styles.stepsContainer}>
           {STEPS.map((step, index) => {
             const isActive = index <= currentStep;
             const isCurrent = index === currentStep;
@@ -169,8 +169,7 @@ export default function ProcessingScreen() {
                 <View
                   style={[
                     styles.stepIcon,
-                    { backgroundColor: isDarkMode ? '#333' : '#eee' },
-                    isActive && { backgroundColor: Colors.primary.main },
+                    isActive && styles.stepIconActive,
                   ]}
                 >
                   <Ionicons
@@ -182,22 +181,21 @@ export default function ProcessingScreen() {
                 <Text
                   style={[
                     styles.stepLabel,
-                    { color: Colors.text.muted },
-                    isActive && { color: Colors.text.primary },
-                    isCurrent && { fontWeight: Typography.fontWeights.bold, color: Colors.primary.main },
+                    isActive && styles.stepLabelActive,
+                    isCurrent && styles.stepLabelCurrent,
                   ]}
                 >
                   {step.label}
                 </Text>
                 {isCurrent && currentStep < 4 && (
                   <View style={styles.loadingDots}>
-                    <Text style={[styles.dots, { color: Colors.primary.main }]}>...</Text>
+                    <Text style={styles.dots}>...</Text>
                   </View>
                 )}
               </View>
             );
           })}
-        </ModernCard>
+        </View>
 
         {/* Cancel Button */}
         <View style={{ marginTop: Spacing['3xl'], width: '100%' }}>
@@ -212,7 +210,7 @@ export default function ProcessingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (Colors, isDarkMode) => StyleSheet.create({
   content: {
     flex: 1,
     justifyContent: 'center',
@@ -228,21 +226,28 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
   },
   title: {
     fontSize: Typography.fontSizes['2xl'],
     fontWeight: Typography.fontWeights.bold,
     textAlign: 'center',
+    color: Colors.text.primary,
   },
   subtitle: {
     fontSize: Typography.fontSizes.base,
     textAlign: 'center',
     marginTop: Spacing.sm,
     marginBottom: Spacing['3xl'],
+    color: Colors.text.secondary,
   },
   stepsContainer: {
     width: '100%',
     padding: Spacing.xl,
+    backgroundColor: Colors.card,
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1,
+    borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
   },
   stepRow: {
     flexDirection: 'row',
@@ -255,11 +260,23 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: isDarkMode ? '#374151' : '#E5E7EB',
+  },
+  stepIconActive: {
+    backgroundColor: Colors.primary.main,
   },
   stepLabel: {
     fontSize: Typography.fontSizes.base,
     marginLeft: Spacing.base,
     flex: 1,
+    color: Colors.text.muted,
+  },
+  stepLabelActive: {
+    color: Colors.text.primary,
+  },
+  stepLabelCurrent: {
+    fontWeight: Typography.fontWeights.bold,
+    color: Colors.primary.main,
   },
   loadingDots: {
     marginLeft: Spacing.sm,
@@ -267,6 +284,7 @@ const styles = StyleSheet.create({
   dots: {
     fontSize: Typography.fontSizes.xl,
     fontWeight: Typography.fontWeights.bold,
+    color: Colors.primary.main,
   },
   errorContainer: {
     flex: 1,
@@ -278,11 +296,13 @@ const styles = StyleSheet.create({
     fontSize: Typography.fontSizes.xl,
     fontWeight: Typography.fontWeights.bold,
     marginTop: Spacing.lg,
+    color: Colors.text.primary,
   },
   errorMessage: {
     fontSize: Typography.fontSizes.base,
     textAlign: 'center',
     marginTop: Spacing.sm,
     marginBottom: Spacing.xl,
+    color: Colors.text.secondary,
   },
 });

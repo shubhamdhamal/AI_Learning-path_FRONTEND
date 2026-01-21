@@ -7,21 +7,30 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "icon": "./assets/AI_Learning_logo.png",
     "splash": {
-      "backgroundColor": "#667eea"
+      "image": "./assets/AI_Learning_logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#111827"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ailearningpath.mobile"
+      "bundleIdentifier": "com.ailearningpath.mobile",
+      "icon": "./assets/AI_Learning_logo.png"
     },
     "android": {
-      "package": "com.ailearningpath.mobile"
+      "package": "com.ailearningpath.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/AI_Learning_logo.png",
+        "backgroundColor": "#111827"
+      }
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "favicon": "./assets/AI_Learning_logo.png"
     },
     "scheme": "ailearningpath",
     "extra": {

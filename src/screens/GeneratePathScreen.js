@@ -8,9 +8,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Modal,
 } from 'react-native';
-import Animated, { FadeInDown, SlideInUp } from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 
 import useLearningPathStore from '../store/learningPathStore';
@@ -204,7 +203,7 @@ export default function GeneratePathScreen({ navigation }) {
                 </View>
               </FadeInView>
 
-              {/* Expertise Level Dropdown */}
+              {/* Expertise Level Inline Dropdown */}
               <FadeInView delay={200} duration={500} slideDistance={20}>
                 <View style={styles.inputGroup}>
                   <View style={styles.labelContainer}>
@@ -212,16 +211,58 @@ export default function GeneratePathScreen({ navigation }) {
                     <Text style={styles.label}>Current Expertise Level</Text>
                   </View>
                   <TouchableOpacity
-                    style={styles.dropdownButton}
-                    onPress={() => setShowExpertiseDropdown(true)}
+                    style={[styles.dropdownButton, showExpertiseDropdown && styles.dropdownButtonActive]}
+                    onPress={() => setShowExpertiseDropdown(!showExpertiseDropdown)}
                     activeOpacity={0.7}
                   >
                     <View style={styles.dropdownContent}>
                       <Text style={styles.dropdownLabel}>{getSelectedExpertise().label}</Text>
                       <Text style={styles.dropdownDescription}>{getSelectedExpertise().description}</Text>
                     </View>
-                    <Ionicons name="chevron-down" size={20} color={Colors.text.secondary} />
+                    <Ionicons 
+                      name={showExpertiseDropdown ? "chevron-up" : "chevron-down"} 
+                      size={20} 
+                      color={Colors.text.secondary} 
+                    />
                   </TouchableOpacity>
+                  
+                  {/* Inline Dropdown Options */}
+                  {showExpertiseDropdown && (
+                    <View style={styles.inlineDropdownContainer}>
+                      {EXPERTISE_LEVELS.map((option) => (
+                        <TouchableOpacity
+                          key={option.value}
+                          style={[
+                            styles.inlineDropdownOption,
+                            formData.expertise_level === option.value && styles.inlineDropdownOptionSelected,
+                          ]}
+                          onPress={() => {
+                            setFormData({ ...formData, expertise_level: option.value });
+                            setShowExpertiseDropdown(false);
+                          }}
+                          activeOpacity={0.7}
+                        >
+                          <View style={styles.dropdownOptionContent}>
+                            <Text style={[
+                              styles.inlineDropdownOptionLabel,
+                              formData.expertise_level === option.value && styles.inlineDropdownOptionLabelSelected,
+                            ]}>
+                              {option.label}
+                            </Text>
+                            <Text style={[
+                              styles.inlineDropdownOptionDescription,
+                              formData.expertise_level === option.value && styles.inlineDropdownOptionDescriptionSelected,
+                            ]}>
+                              {option.description}
+                            </Text>
+                          </View>
+                          {formData.expertise_level === option.value && (
+                            <Ionicons name="checkmark-circle" size={22} color={Colors.primary.main} />
+                          )}
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
                 </View>
               </FadeInView>
 
@@ -338,58 +379,6 @@ export default function GeneratePathScreen({ navigation }) {
         topic={formData.topic}
       />
 
-      {/* Expertise Level Dropdown Modal */}
-      <Modal
-        visible={showExpertiseDropdown}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowExpertiseDropdown(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowExpertiseDropdown(false)}
-        >
-          <Animated.View
-            style={styles.dropdownModal}
-            entering={SlideInUp.springify()}
-          >
-            <Text style={styles.dropdownModalTitle}>Select Expertise Level</Text>
-            {EXPERTISE_LEVELS.map((option, idx) => (
-              <FadeInView key={option.value} delay={idx * 50} duration={300}>
-                <TouchableOpacity
-                  style={[
-                    styles.dropdownOption,
-                    formData.expertise_level === option.value && styles.dropdownOptionSelected,
-                  ]}
-                  onPress={() => {
-                    setFormData({ ...formData, expertise_level: option.value });
-                    setShowExpertiseDropdown(false);
-                  }}
-                >
-                  <View style={styles.dropdownOptionContent}>
-                    <Text style={[
-                      styles.dropdownOptionLabel,
-                      formData.expertise_level === option.value && styles.dropdownOptionLabelSelected,
-                    ]}>
-                      {option.label}
-                    </Text>
-                    <Text style={[
-                      styles.dropdownOptionDescription,
-                      formData.expertise_level === option.value && styles.dropdownOptionDescriptionSelected,
-                    ]}>
-                      {option.description}
-                    </Text>
-                  </View>
-                  {formData.expertise_level === option.value && (
-                    <Ionicons name="checkmark-circle" size={24} color={Colors.primary.main} />
-                  )}
-                </TouchableOpacity>
-              </FadeInView>
-            ))}
-          </Animated.View>
-        </TouchableOpacity>
-      </Modal>
     </ScreenWrapper>
   );
 }
@@ -553,58 +542,46 @@ const createStyles = (Colors, isDarkMode) => StyleSheet.create({
     color: Colors.text.secondary,
     marginTop: Spacing.xs,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-    padding: Spacing.lg,
+  dropdownButtonActive: {
+    borderColor: Colors.primary.main,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
-  dropdownModal: {
+  // Inline dropdown styles
+  inlineDropdownContainer: {
     backgroundColor: Colors.background.card,
-    borderRadius: BorderRadius.xl,
-    borderTopLeftRadius: BorderRadius['2xl'],
-    borderTopRightRadius: BorderRadius['2xl'],
-    padding: Spacing.lg,
-    maxHeight: '70%',
+    borderWidth: 1,
+    borderTopWidth: 0,
+    borderColor: Colors.primary.main,
+    borderBottomLeftRadius: BorderRadius.lg,
+    borderBottomRightRadius: BorderRadius.lg,
+    overflow: 'hidden',
   },
-  dropdownModalTitle: {
-    fontSize: Typography.fontSizes.lg,
-    fontWeight: Typography.fontWeights.bold,
-    color: Colors.text.primary,
-    marginBottom: Spacing.lg,
-    textAlign: 'center',
-  },
-  dropdownOption: {
+  inlineDropdownOption: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing.base,
     paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.lg,
-    marginBottom: Spacing.sm,
-    backgroundColor: `${Colors.text.primary}08`,
+    borderBottomWidth: 1,
+    borderBottomColor: `${Colors.text.primary}10`,
   },
-  dropdownOptionSelected: {
-    backgroundColor: `${Colors.primary.main}20`,
-    borderWidth: 2,
-    borderColor: Colors.primary.main,
+  inlineDropdownOptionSelected: {
+    backgroundColor: `${Colors.primary.main}15`,
   },
-  dropdownOptionContent: {
-    flex: 1,
-  },
-  dropdownOptionLabel: {
+  inlineDropdownOptionLabel: {
     fontSize: Typography.fontSizes.base,
     fontWeight: Typography.fontWeights.semibold,
     color: Colors.text.primary,
   },
-  dropdownOptionLabelSelected: {
+  inlineDropdownOptionLabelSelected: {
     color: Colors.primary.main,
   },
-  dropdownOptionDescription: {
+  inlineDropdownOptionDescription: {
     fontSize: Typography.fontSizes.sm,
     color: Colors.text.secondary,
     marginTop: Spacing.xs,
   },
-  dropdownOptionDescriptionSelected: {
+  inlineDropdownOptionDescriptionSelected: {
     color: Colors.primary.main,
   },
 });

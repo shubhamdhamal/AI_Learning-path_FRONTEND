@@ -219,13 +219,13 @@ export default function GeneratePathScreen({ navigation }) {
                       <Text style={styles.dropdownLabel}>{getSelectedExpertise().label}</Text>
                       <Text style={styles.dropdownDescription}>{getSelectedExpertise().description}</Text>
                     </View>
-                    <Ionicons 
-                      name={showExpertiseDropdown ? "chevron-up" : "chevron-down"} 
-                      size={20} 
-                      color={Colors.text.secondary} 
+                    <Ionicons
+                      name={showExpertiseDropdown ? "chevron-up" : "chevron-down"}
+                      size={20}
+                      color={Colors.text.secondary}
                     />
                   </TouchableOpacity>
-                  
+
                   {/* Inline Dropdown Options */}
                   {showExpertiseDropdown && (
                     <View style={styles.inlineDropdownContainer}>

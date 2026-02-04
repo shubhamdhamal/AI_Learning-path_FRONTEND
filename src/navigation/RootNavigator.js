@@ -11,6 +11,7 @@ import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 
 // Main App Screens
+import HomeScreen from '../screens/HomeScreen';
 import DashboardScreen from '../screens/DashboardScreen';
 import GeneratePathScreen from '../screens/GeneratePathScreen';
 import ProcessingScreen from '../screens/ProcessingScreen';
@@ -64,7 +65,9 @@ function MainTabs() {
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
-          if (route.name === 'DashboardTab') {
+          if (route.name === 'HomeTab') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'DashboardTab') {
             iconName = focused ? 'grid' : 'grid-outline';
           } else if (route.name === 'GenerateTab') {
             iconName = focused ? 'sparkles' : 'sparkles-outline';
@@ -76,6 +79,11 @@ function MainTabs() {
         },
       })}
     >
+      <Tab.Screen
+        name="HomeTab"
+        component={HomeScreen}
+        options={{ tabBarLabel: 'Home' }}
+      />
       <Tab.Screen
         name="DashboardTab"
         component={DashboardScreen}

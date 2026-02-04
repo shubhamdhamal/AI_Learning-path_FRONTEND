@@ -180,7 +180,7 @@ export default function GenerationProgress({ isVisible, onCancel, topic }) {
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
                         >
-                            <Ionicons name="sparkles" size={32} color={Colors.text.primary} />
+                            <Ionicons name="sync" size={32} color={Colors.text.primary} />
                         </LinearGradient>
                     </Animated.View>
                     <Text style={styles.title}>

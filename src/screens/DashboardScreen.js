@@ -179,7 +179,14 @@ export default function DashboardScreen({ navigation }) {
                   ]}
                 />
               </View>
-              <Text style={styles.progressText}>{completion}% Complete</Text>
+              <View style={styles.progressRow}>
+                <Text style={styles.createdDate}>
+                  {item.created_at
+                    ? new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                    : 'Recently created'}
+                </Text>
+                <Text style={styles.progressText}>{completion}% Complete</Text>
+              </View>
             </View>
           </ModernCard>
         </FadeInView>
@@ -340,11 +347,20 @@ const createStyles = (Colors, isDarkMode) => StyleSheet.create({
     height: '100%',
     borderRadius: BorderRadius.full,
   },
+  progressRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  createdDate: {
+    fontSize: Typography.fontSizes.xs,
+    color: Colors.text.tertiary || Colors.text.secondary,
+    fontWeight: Typography.fontWeights.regular,
+  },
   progressText: {
     fontSize: Typography.fontSizes.xs,
     color: Colors.text.secondary,
     fontWeight: Typography.fontWeights.medium,
-    textAlign: 'right',
   },
   emptyContainer: {
     flex: 1,

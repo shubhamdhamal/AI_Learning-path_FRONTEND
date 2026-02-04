@@ -14,14 +14,14 @@ const ModernCard = ({
 
     const getCardBackgroundColor = () => {
         if (variant === 'glass') {
-            return isDarkMode ? 'rgba(22, 33, 62, 0.4)' : 'rgba(255, 255, 255, 0.6)';
+            return isDarkMode ? 'rgba(22, 33, 62, 0.4)' : 'rgba(255, 255, 255, 0.95)';
         }
         return colors.card;
     };
 
     const getBorderColor = () => {
         if (variant === 'glass') {
-            return isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.2)';
+            return isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)';
         }
         return 'transparent';
     };

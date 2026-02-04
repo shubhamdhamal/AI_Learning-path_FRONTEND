@@ -86,7 +86,7 @@ export default function ProfileScreen({ navigation }) {
               </View>
             </View>
             <Text style={styles.userName}>
-              {isGuest ? 'Guest User' : (user?.name || 'User')}
+              {isGuest ? 'Guest User' : (user?.display_name || user?.username || user?.name || 'User')}
             </Text>
             {!isGuest && user?.email && (
               <Text style={styles.userEmail}>{user.email}</Text>

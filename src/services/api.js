@@ -2,9 +2,9 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Base URL for API - reads from environment variable (EXPO_PUBLIC_ prefix required for Expo)
-// For Codespaces: https://automatic-garbanzo-g9j56jwqw5w3ppq6-5000.app.github.dev
-// For local: http://localhost:5000
-export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:5000';
+// For local development: http://localhost:7860 or http://<your-ip>:7860
+// For production: https://your-deployed-backend.com
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:7860';
 
 console.log('API Base URL:', API_BASE_URL);
 
@@ -437,6 +437,204 @@ function shuffleWithAnswer(options) {
   const correctIndex = indices.indexOf(0);
 
   return { options: shuffledOptions, correctIndex };
+}
+
+// ============ Trending Technologies API (Stack Overflow) ============
+
+// Technology tag mappings for better display names and icons
+const TECH_TAG_CONFIG = {
+  'python': { name: 'Python', icon: 'logo-python', color: '#3776AB' },
+  'javascript': { name: 'JavaScript', icon: 'logo-javascript', color: '#F7DF1E' },
+  'java': { name: 'Java', icon: 'cafe', color: '#ED8B00' },
+  'c#': { name: 'C#', icon: 'code-slash', color: '#239120' },
+  'php': { name: 'PHP', icon: 'server', color: '#777BB4' },
+  'android': { name: 'Android', icon: 'logo-android', color: '#3DDC84' },
+  'html': { name: 'HTML', icon: 'logo-html5', color: '#E34F26' },
+  'css': { name: 'CSS', icon: 'logo-css3', color: '#1572B6' },
+  'jquery': { name: 'jQuery', icon: 'code', color: '#0769AD' },
+  'c++': { name: 'C++', icon: 'hardware-chip', color: '#00599C' },
+  'ios': { name: 'iOS', icon: 'logo-apple', color: '#000000' },
+  'mysql': { name: 'MySQL', icon: 'server', color: '#4479A1' },
+  'sql': { name: 'SQL', icon: 'server', color: '#CC2927' },
+  'r': { name: 'R', icon: 'stats-chart', color: '#276DC3' },
+  'node.js': { name: 'Node.js', icon: 'logo-nodejs', color: '#339933' },
+  'reactjs': { name: 'React', icon: 'logo-react', color: '#61DAFB' },
+  'react-native': { name: 'React Native', icon: 'phone-portrait', color: '#61DAFB' },
+  'angular': { name: 'Angular', icon: 'logo-angular', color: '#DD0031' },
+  'vue.js': { name: 'Vue.js', icon: 'logo-vue', color: '#4FC08D' },
+  'typescript': { name: 'TypeScript', icon: 'code', color: '#3178C6' },
+  'swift': { name: 'Swift', icon: 'logo-apple', color: '#FA7343' },
+  'kotlin': { name: 'Kotlin', icon: 'logo-android', color: '#7F52FF' },
+  'go': { name: 'Go', icon: 'terminal', color: '#00ADD8' },
+  'rust': { name: 'Rust', icon: 'cog', color: '#000000' },
+  'ruby': { name: 'Ruby', icon: 'diamond', color: '#CC342D' },
+  'scala': { name: 'Scala', icon: 'code', color: '#DC322F' },
+  'docker': { name: 'Docker', icon: 'cube', color: '#2496ED' },
+  'kubernetes': { name: 'Kubernetes', icon: 'git-network', color: '#326CE5' },
+  'aws': { name: 'AWS', icon: 'cloud', color: '#FF9900' },
+  'azure': { name: 'Azure', icon: 'cloud', color: '#0078D4' },
+  'firebase': { name: 'Firebase', icon: 'flame', color: '#FFCA28' },
+  'mongodb': { name: 'MongoDB', icon: 'leaf', color: '#47A248' },
+  'postgresql': { name: 'PostgreSQL', icon: 'server', color: '#4169E1' },
+  'redis': { name: 'Redis', icon: 'flash', color: '#DC382D' },
+  'graphql': { name: 'GraphQL', icon: 'git-branch', color: '#E10098' },
+  'tensorflow': { name: 'TensorFlow', icon: 'hardware-chip', color: '#FF6F00' },
+  'pytorch': { name: 'PyTorch', icon: 'flame', color: '#EE4C2C' },
+  'machine-learning': { name: 'Machine Learning', icon: 'hardware-chip', color: '#8B5CF6' },
+  'deep-learning': { name: 'Deep Learning', icon: 'git-network', color: '#6366F1' },
+  'data-science': { name: 'Data Science', icon: 'analytics', color: '#F59E0B' },
+  'artificial-intelligence': { name: 'AI', icon: 'sparkles', color: '#8B5CF6' },
+  'blockchain': { name: 'Blockchain', icon: 'link', color: '#121D33' },
+  'flutter': { name: 'Flutter', icon: 'phone-portrait', color: '#02569B' },
+  'next.js': { name: 'Next.js', icon: 'globe', color: '#000000' },
+  'django': { name: 'Django', icon: 'server', color: '#092E20' },
+  'spring-boot': { name: 'Spring Boot', icon: 'leaf', color: '#6DB33F' },
+  'laravel': { name: 'Laravel', icon: 'code', color: '#FF2D20' },
+  '.net': { name: '.NET', icon: 'code-slash', color: '#512BD4' },
+  'linux': { name: 'Linux', icon: 'terminal', color: '#FCC624' },
+  'git': { name: 'Git', icon: 'git-branch', color: '#F05032' },
+  'elasticsearch': { name: 'Elasticsearch', icon: 'search', color: '#005571' },
+  'apache-spark': { name: 'Apache Spark', icon: 'flash', color: '#E25A1C' },
+};
+
+// Cache for trending data
+let trendingCache = {
+  data: null,
+  timestamp: 0,
+  ttl: 3600000, // 1 hour cache
+};
+
+export const trendingService = {
+  /**
+   * Fetch trending technologies from Stack Overflow API
+   * @param {number} limit - Number of technologies to return
+   * @returns {Promise<Array>} Array of trending technologies with growth data
+   */
+  getTrendingTechnologies: async (limit = 15) => {
+    try {
+      // Check cache first
+      const now = Date.now();
+      if (trendingCache.data && (now - trendingCache.timestamp) < trendingCache.ttl) {
+        console.log('Using cached trending data');
+        return trendingCache.data.slice(0, limit);
+      }
+
+      console.log('Fetching fresh trending data from Stack Overflow...');
+
+      // Fetch popular tags from Stack Overflow
+      const response = await axios.get(
+        'https://api.stackexchange.com/2.3/tags',
+        {
+          params: {
+            order: 'desc',
+            sort: 'popular',
+            site: 'stackoverflow',
+            pagesize: 50,
+            filter: '!nNPvSNPI7A', // Include count field
+          },
+          timeout: 10000,
+        }
+      );
+
+      if (!response.data?.items) {
+        throw new Error('Invalid response from Stack Overflow API');
+      }
+
+      const tags = response.data.items;
+
+      // Filter to technology-related tags first
+      const techKeywords = ['python', 'javascript', 'java', 'react', 'node', 'android',
+        'ios', 'sql', 'html', 'css', 'c#', 'c++', 'php', 'ruby', 'go', 'rust',
+        'swift', 'kotlin', 'typescript', 'angular', 'vue', 'docker', 'kubernetes',
+        'aws', 'azure', 'firebase', 'mongodb', 'postgresql', 'redis', 'graphql',
+        'tensorflow', 'pytorch', 'machine-learning', 'deep-learning', 'flutter',
+        'next', 'django', 'spring', 'laravel', '.net', 'linux', 'git', 'blockchain',
+        'data-science', 'artificial-intelligence', 'elasticsearch', 'spark'];
+
+      const filteredTags = tags
+        .filter(tag => techKeywords.some(keyword => tag.name.toLowerCase().includes(keyword)))
+        .sort((a, b) => b.count - a.count) // Sort by count descending
+        .slice(0, limit);
+
+      // Get max and min counts for better percentage distribution
+      const maxCount = filteredTags[0]?.count || 1;
+      const minCount = filteredTags[filteredTags.length - 1]?.count || 0;
+      const countRange = maxCount - minCount || 1;
+
+      const trendingTechs = filteredTags.map((tag, index) => {
+        const config = TECH_TAG_CONFIG[tag.name.toLowerCase()] || {
+          name: tag.name.charAt(0).toUpperCase() + tag.name.slice(1),
+          icon: 'code',
+          color: getColorForIndex(index),
+        };
+
+        // Calculate popularity with better distribution (100% to 40% range)
+        // This ensures visible difference between rankings
+        const normalizedScore = (tag.count - minCount) / countRange; // 0 to 1
+        const popularity = Math.round(40 + (normalizedScore * 60)); // 40% to 100%
+
+        return {
+          name: config.name,
+          tag: tag.name,
+          icon: config.icon,
+          color: config.color,
+          count: tag.count,
+          growth: popularity,
+        };
+      });
+
+      // Update cache
+      trendingCache = {
+        data: trendingTechs,
+        timestamp: now,
+        ttl: 3600000,
+      };
+
+      return trendingTechs;
+    } catch (error) {
+      console.error('Error fetching trending technologies:', error.message);
+      // Return fallback static data
+      return getFallbackTrendingData(limit);
+    }
+  },
+
+  /**
+   * Clear the trending cache
+   */
+  clearCache: () => {
+    trendingCache = { data: null, timestamp: 0, ttl: 3600000 };
+  },
+};
+
+// Helper function to get colors for tags without config
+function getColorForIndex(index) {
+  const colors = [
+    '#8B5CF6', '#06B6D4', '#10B981', '#F59E0B', '#EC4899',
+    '#6366F1', '#14B8A6', '#F97316', '#84CC16', '#EF4444',
+  ];
+  return colors[index % colors.length];
+}
+
+// Fallback data when API is unavailable
+function getFallbackTrendingData(limit) {
+  const fallbackData = [
+    { name: 'Python', tag: 'python', icon: 'logo-python', color: '#3776AB', growth: 100 },
+    { name: 'JavaScript', tag: 'javascript', icon: 'logo-javascript', color: '#F7DF1E', growth: 95 },
+    { name: 'Java', tag: 'java', icon: 'cafe', color: '#ED8B00', growth: 72 },
+    { name: 'TypeScript', tag: 'typescript', icon: 'code', color: '#3178C6', growth: 68 },
+    { name: 'React', tag: 'reactjs', icon: 'logo-react', color: '#61DAFB', growth: 65 },
+    { name: 'Node.js', tag: 'node.js', icon: 'logo-nodejs', color: '#339933', growth: 58 },
+    { name: 'AWS', tag: 'aws', icon: 'cloud', color: '#FF9900', growth: 52 },
+    { name: 'Docker', tag: 'docker', icon: 'cube', color: '#2496ED', growth: 48 },
+    { name: 'Machine Learning', tag: 'machine-learning', icon: 'hardware-chip', color: '#8B5CF6', growth: 45 },
+    { name: 'PostgreSQL', tag: 'postgresql', icon: 'server', color: '#4169E1', growth: 42 },
+    { name: 'MongoDB', tag: 'mongodb', icon: 'leaf', color: '#47A248', growth: 38 },
+    { name: 'Kubernetes', tag: 'kubernetes', icon: 'git-network', color: '#326CE5', growth: 35 },
+    { name: 'Flutter', tag: 'flutter', icon: 'phone-portrait', color: '#02569B', growth: 32 },
+    { name: 'Go', tag: 'go', icon: 'terminal', color: '#00ADD8', growth: 28 },
+    { name: 'Rust', tag: 'rust', icon: 'cog', color: '#DEA584', growth: 25 },
+  ];
+  return fallbackData.slice(0, limit);
 }
 
 export default api;

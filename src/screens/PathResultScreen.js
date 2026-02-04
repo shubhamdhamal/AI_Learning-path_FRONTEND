@@ -192,10 +192,20 @@ export default function PathResultScreen({ navigation, route }) {
           </ModernCard>
         </FadeInView>
 
-        {/* Milestones */}
+        {/* Save Prompt Banner */}
+        <FadeInView delay={150} duration={500}>
+          <View style={styles.savePromptBanner}>
+            <Ionicons name="information-circle" size={20} color={Colors.primary.main} />
+            <Text style={styles.savePromptText}>
+              Click <Text style={styles.savePromptBold}>Save Path</Text> below to save this learning path and complete it later!
+            </Text>
+          </View>
+        </FadeInView>
+
+        {/* Weekly Learning Plan */}
         <FadeInView delay={200} duration={600} slideDistance={20}>
           <Text style={styles.milestonesTitle}>
-            <Ionicons name="rocket-outline" size={20} color={Colors.text.primary} /> Learning Milestones
+            <Ionicons name="calendar-outline" size={20} color={Colors.text.primary} /> Weekly Learning Plan
           </Text>
         </FadeInView>
 
@@ -218,7 +228,7 @@ export default function PathResultScreen({ navigation, route }) {
                 <View style={styles.milestoneTitleContainer}>
                   <Text style={styles.milestoneTitle}>{milestone.title || milestone.milestone}</Text>
                   <Text style={styles.milestoneDuration}>
-                    {milestone.duration_weeks || 1} week{milestone.duration_weeks !== 1 ? 's' : ''}
+                    {milestone.estimated_hours || Math.ceil((pathData.total_hours || 10) / (pathData.milestones?.length || 1))} hours
                   </Text>
                 </View>
                 <Ionicons
@@ -261,48 +271,32 @@ export default function PathResultScreen({ navigation, route }) {
           </FadeInView>
         ))}
 
-        {/* Job Market Insights - At bottom of learning path */}
-        {(pathData.job_market || pathData.job_market_data) && (
-          <FadeInView delay={600} duration={600}>
-            <ModernCard variant="filled" style={styles.insightsCard}>
-              <Text style={styles.sectionTitle}>
-                <Ionicons name="briefcase-outline" size={20} color={Colors.primary.main} /> Job Market Insights
-              </Text>
-              <View style={styles.insightsGrid}>
-                {(pathData.job_market?.average_salary || pathData.job_market_data?.average_salary) && (
-                  <View style={styles.insightItem}>
-                    <Ionicons name="cash-outline" size={20} color={Colors.status.success} />
-                    <Text style={styles.insightValue}>{pathData.job_market?.average_salary || pathData.job_market_data?.average_salary}</Text>
-                    <Text style={styles.insightLabel}>Avg. Salary</Text>
-                  </View>
-                )}
-                {(pathData.job_market?.demand || pathData.job_market_data?.demand) && (
-                  <View style={styles.insightItem}>
-                    <Ionicons name="trending-up" size={20} color={Colors.status.warning} />
-                    <Text style={styles.insightValue}>{pathData.job_market?.demand || pathData.job_market_data?.demand}</Text>
-                    <Text style={styles.insightLabel}>Demand</Text>
-                  </View>
-                )}
-                {(pathData.job_market?.growth || pathData.job_market_data?.growth) && (
-                  <View style={styles.insightItem}>
-                    <Ionicons name="analytics" size={20} color={Colors.primary.main} />
-                    <Text style={styles.insightValue}>{pathData.job_market?.growth || pathData.job_market_data?.growth}</Text>
-                    <Text style={styles.insightLabel}>Growth</Text>
-                  </View>
-                )}
-                {(pathData.job_market?.related_roles || pathData.job_market_data?.related_roles)?.length > 0 && (
-                  <View style={styles.insightItemWide}>
-                    <Ionicons name="people-outline" size={20} color={Colors.primary.main} />
-                    <Text style={styles.insightValue}>
-                      {(pathData.job_market?.related_roles || pathData.job_market_data?.related_roles).slice(0, 3).join(', ')}
-                    </Text>
-                    <Text style={styles.insightLabel}>Related Roles</Text>
-                  </View>
-                )}
+        {/* Study Tips Section */}
+        <FadeInView delay={600} duration={600}>
+          <ModernCard variant="filled" style={styles.insightsCard}>
+            <Text style={styles.sectionTitle}>
+              <Ionicons name="bulb-outline" size={20} color={Colors.primary.main} /> Study Tips
+            </Text>
+            <View style={styles.tipsContainer}>
+              <View style={styles.tipItem}>
+                <Ionicons name="checkmark-circle" size={18} color={Colors.status.success} />
+                <Text style={styles.tipText}>Complete milestones in order for best results</Text>
               </View>
-            </ModernCard>
-          </FadeInView>
-        )}
+              <View style={styles.tipItem}>
+                <Ionicons name="time" size={18} color={Colors.primary.main} />
+                <Text style={styles.tipText}>Dedicate {Math.ceil((pathData.total_hours || 10) / (pathData.duration_weeks || 4))} hours per week to stay on track</Text>
+              </View>
+              <View style={styles.tipItem}>
+                <Ionicons name="book" size={18} color={Colors.status.warning} />
+                <Text style={styles.tipText}>Practice with hands-on projects after each milestone</Text>
+              </View>
+              <View style={styles.tipItem}>
+                <Ionicons name="repeat" size={18} color={Colors.secondary?.main || Colors.primary.main} />
+                <Text style={styles.tipText}>Review previous topics regularly to reinforce learning</Text>
+              </View>
+            </View>
+          </ModernCard>
+        </FadeInView>
 
         {/* Action Buttons */}
         <FadeInView delay={700} duration={600} style={styles.actionButtonsContainer}>
@@ -500,6 +494,42 @@ const createStyles = (Colors, isDarkMode) => StyleSheet.create({
     fontWeight: Typography.fontWeights.semibold,
     color: Colors.text.primary,
     marginBottom: Spacing.md,
+  },
+  savePromptBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: isDarkMode ? 'rgba(6, 182, 212, 0.15)' : 'rgba(6, 182, 212, 0.1)',
+    borderWidth: 1,
+    borderColor: isDarkMode ? 'rgba(6, 182, 212, 0.3)' : 'rgba(6, 182, 212, 0.2)',
+    borderRadius: BorderRadius.md,
+    padding: Spacing.md,
+    marginBottom: Spacing.lg,
+    gap: Spacing.sm,
+  },
+  savePromptText: {
+    flex: 1,
+    fontSize: Typography.fontSizes.sm,
+    color: Colors.text.primary,
+    lineHeight: 20,
+  },
+  savePromptBold: {
+    fontWeight: Typography.fontWeights.bold,
+    color: Colors.primary.main,
+  },
+  tipsContainer: {
+    gap: Spacing.sm,
+  },
+  tipItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.xs,
+  },
+  tipText: {
+    flex: 1,
+    fontSize: Typography.fontSizes.sm,
+    color: Colors.text.secondary,
+    lineHeight: 20,
   },
   insightsGrid: {
     flexDirection: 'row',

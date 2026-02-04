@@ -350,7 +350,7 @@ export default function GeneratePathScreen({ navigation }) {
               <FadeInView delay={450} duration={500} slideDistance={20}>
                 <ModernButton
                   variant="primary"
-                  size="lg"
+                  size="md"
                   onPress={handleSubmit}
                   disabled={isGenerating}
                   style={styles.submitButton}
@@ -487,7 +487,7 @@ const createStyles = (Colors, isDarkMode) => StyleSheet.create({
     flex: 1,
   },
   optionLabel: {
-    fontSize: Typography.fontSizes.base,
+    fontSize: Typography.fontSizes.sm,
     fontWeight: Typography.fontWeights.semibold,
     color: Colors.text.primary,
   },
@@ -504,12 +504,14 @@ const createStyles = (Colors, isDarkMode) => StyleSheet.create({
   },
   submitButton: {
     marginTop: Spacing.lg,
+    marginHorizontal: 0,
   },
   submitButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: Spacing.sm,
+    paddingVertical: Spacing.md,
   },
   submitButtonText: {
     color: '#FFFFFF',
@@ -569,7 +571,7 @@ const createStyles = (Colors, isDarkMode) => StyleSheet.create({
     backgroundColor: `${Colors.primary.main}15`,
   },
   inlineDropdownOptionLabel: {
-    fontSize: Typography.fontSizes.base,
+    fontSize: Typography.fontSizes.sm,
     fontWeight: Typography.fontWeights.semibold,
     color: Colors.text.primary,
   },

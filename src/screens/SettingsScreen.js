@@ -119,7 +119,7 @@ export default function SettingsScreen({ navigation }) {
           </ModernCard>
         </FadeInView>
 
-        {/* API Settings */}
+        {/* API Settings - Commented out
         <FadeInView delay={300} duration={600} slideDistance={30}>
           <Text style={styles.sectionTitle}>Developer</Text>
           <ModernCard variant="filled" style={styles.settingsCard}>
@@ -144,8 +144,9 @@ export default function SettingsScreen({ navigation }) {
             </View>
           </ModernCard>
         </FadeInView>
+        */}
 
-        {/* Data Management */}
+        {/* Data Management - Commented out
         <FadeInView delay={400} duration={600} slideDistance={30}>
           <Text style={styles.sectionTitle}>Data</Text>
           <ModernCard variant="filled" style={styles.settingsCard}>
@@ -160,9 +161,10 @@ export default function SettingsScreen({ navigation }) {
             </TouchableOpacity>
           </ModernCard>
         </FadeInView>
+        */}
 
         {/* About */}
-        <FadeInView delay={500} duration={600} slideDistance={30}>
+        <FadeInView delay={300} duration={600} slideDistance={30}>
           <Text style={styles.sectionTitle}>About</Text>
           <ModernCard variant="glass" style={styles.settingsCard}>
             <View style={styles.aboutItem}>

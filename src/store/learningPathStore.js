@@ -202,7 +202,7 @@ const useLearningPathStore = create((set, get) => ({
 
   // Update milestone completion
   updateMilestoneCompletion: async (pathId, milestoneIndex, completed) => {
-    const { savedPaths } = get();
+    const { savedPaths, currentPath } = get();
     const pathIndex = savedPaths.findIndex(p => p.id === pathId);
 
     if (pathIndex < 0) return { success: false, error: 'Path not found' };
@@ -212,17 +212,29 @@ const useLearningPathStore = create((set, get) => ({
       try {
         await learningPathService.updateMilestone(pathId, milestoneIndex, completed);
       } catch (apiError) {
-        console.log('Could not update milestone in API');
+        console.log('Could not update milestone in API:', apiError);
       }
 
-      // Update locally
+      // Update locally in savedPaths
       const newPaths = [...savedPaths];
       if (!newPaths[pathIndex].completedMilestones) {
         newPaths[pathIndex].completedMilestones = {};
       }
       newPaths[pathIndex].completedMilestones[milestoneIndex] = completed;
 
-      set({ savedPaths: newPaths });
+      // Also update currentPath if it's the same path
+      let updatedCurrentPath = currentPath;
+      if (currentPath && currentPath.id === pathId) {
+        updatedCurrentPath = {
+          ...currentPath,
+          completedMilestones: {
+            ...(currentPath.completedMilestones || {}),
+            [milestoneIndex]: completed
+          }
+        };
+      }
+
+      set({ savedPaths: newPaths, currentPath: updatedCurrentPath });
       get().persistPaths();
 
       return { success: true };

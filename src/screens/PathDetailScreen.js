@@ -97,7 +97,7 @@ export default function PathDetailScreen({ navigation, route }) {
             </View>
             <Text style={styles.progressSubtext}>
               {Object.values(completedMilestones).filter(Boolean).length} of{' '}
-              {path.milestones?.length || 0} milestones completed
+              {path.milestones?.length || 0} weeks completed
             </Text>
           </ModernCard>
         </FadeInView>
@@ -180,10 +180,10 @@ export default function PathDetailScreen({ navigation, route }) {
           </FadeInView>
         )}
 
-        {/* Milestones */}
+        {/* Weekly Learning Plan */}
         <FadeInView delay={300} duration={600} slideDistance={20}>
-          <Text style={styles.sectionTitle}>
-            <Ionicons name="rocket-outline" size={20} /> Learning Milestones
+          <Text style={styles.milestonesTitle}>
+            <Ionicons name="calendar-outline" size={20} /> Weekly Learning Plan
           </Text>
         </FadeInView>
 
@@ -232,8 +232,7 @@ export default function PathDetailScreen({ navigation, route }) {
                       {milestone.title || milestone.milestone}
                     </Text>
                     <Text style={styles.milestoneMeta}>
-                      Week {index + 1} • {milestone.duration_weeks || 1} week
-                      {(milestone.duration_weeks || 1) !== 1 ? 's' : ''}
+                      {milestone.estimated_hours || Math.ceil((path.total_hours || 10) / (path.milestones?.length || 1))} hours
                     </Text>
                   </View>
 
@@ -306,50 +305,32 @@ export default function PathDetailScreen({ navigation, route }) {
           );
         })}
 
-        {/* Job Market Insights */}
-        {(path.job_market || path.job_market_data) && (
-          <FadeInView delay={600} duration={600}>
-            <ModernCard variant="filled" style={styles.jobMarketCard}>
-              <Text style={styles.jobMarketTitle}>
-                <Ionicons name="briefcase-outline" size={20} /> Job Market Insights
-              </Text>
-              <View style={styles.jobMarketGrid}>
-                {(path.job_market?.average_salary || path.job_market_data?.average_salary) && (
-
-                  <View style={styles.jobMarketItem}>
-                    <Ionicons name="cash-outline" size={24} color={Colors.status.success} />
-                    <Text style={styles.jobMarketValue}>
-                      {path.job_market?.average_salary || path.job_market_data?.average_salary}
-                    </Text>
-                    <Text style={styles.jobMarketLabel}>Avg. Salary</Text>
-                  </View>
-                )}
-                {(path.job_market?.demand || path.job_market_data?.demand) && (
-                  <View style={styles.jobMarketItem}>
-                    <Ionicons name="trending-up" size={24} color={Colors.status.warning} />
-                    <Text style={styles.jobMarketValue}>{path.job_market?.demand || path.job_market_data?.demand}</Text>
-                    <Text style={styles.jobMarketLabel}>Demand</Text>
-                  </View>
-                )}
-                {(path.job_market?.growth || path.job_market_data?.growth) && (
-                  <View style={styles.jobMarketItem}>
-                    <Ionicons name="analytics" size={24} color={Colors.primary.main} />
-                    <Text style={styles.jobMarketValue}>{path.job_market?.growth || path.job_market_data?.growth}</Text>
-                    <Text style={styles.jobMarketLabel}>Growth</Text>
-                  </View>
-                )}
+        {/* Study Tips Section */}
+        <FadeInView delay={600} duration={600}>
+          <ModernCard variant="filled" style={styles.jobMarketCard}>
+            <Text style={styles.jobMarketTitle}>
+              <Ionicons name="bulb-outline" size={20} /> Study Tips
+            </Text>
+            <View style={styles.tipsContainer}>
+              <View style={styles.tipItem}>
+                <Ionicons name="checkmark-circle" size={18} color={Colors.status.success} />
+                <Text style={styles.tipText}>Complete milestones in order for best results</Text>
               </View>
-              {(path.job_market?.related_roles || path.job_market_data?.related_roles)?.length > 0 && (
-                <View style={styles.relatedRolesContainer}>
-                  <Text style={styles.relatedRolesTitle}>Related Roles:</Text>
-                  <Text style={styles.relatedRolesText}>
-                    {(path.job_market?.related_roles || path.job_market_data?.related_roles).join(', ')}
-                  </Text>
-                </View>
-              )}
-            </ModernCard>
-          </FadeInView>
-        )}
+              <View style={styles.tipItem}>
+                <Ionicons name="time" size={18} color={Colors.primary.main} />
+                <Text style={styles.tipText}>Dedicate {Math.ceil((path.total_hours || 10) / (path.duration_weeks || 4))} hours per week to stay on track</Text>
+              </View>
+              <View style={styles.tipItem}>
+                <Ionicons name="book" size={18} color={Colors.status.warning} />
+                <Text style={styles.tipText}>Practice with hands-on projects after each milestone</Text>
+              </View>
+              <View style={styles.tipItem}>
+                <Ionicons name="repeat" size={18} color={Colors.secondary?.main || Colors.primary.main} />
+                <Text style={styles.tipText}>Review previous topics regularly to reinforce learning</Text>
+              </View>
+            </View>
+          </ModernCard>
+        </FadeInView>
       </ScrollView>
     </ScreenWrapper>
   );
@@ -585,6 +566,21 @@ const createStyles = (Colors, isDarkMode) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.sm,
+  },
+  tipsContainer: {
+    gap: Spacing.sm,
+  },
+  tipItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.xs,
+  },
+  tipText: {
+    flex: 1,
+    fontSize: Typography.fontSizes.sm,
+    color: Colors.text.secondary,
+    lineHeight: 20,
   },
   jobMarketGrid: {
     flexDirection: 'row',

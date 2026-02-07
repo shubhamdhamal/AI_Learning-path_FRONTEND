@@ -78,7 +78,7 @@ export default function LoginScreen({ navigation }) {
           <FadeInView delay={100} duration={800} style={styles.header}>
             <View style={styles.logoContainer}>
               <Image
-                source={require('../../assets/AI_Learning_logo.png')}
+                source={require('../../assets/adaptive-icon.png')}
                 style={styles.logo}
                 resizeMode="contain"
               />

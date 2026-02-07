@@ -94,7 +94,7 @@ export default function RegisterScreen({ navigation }) {
           <FadeInView delay={200} duration={800} style={styles.header}>
             <View style={styles.logoContainer}>
               <Image
-                source={require('../../assets/AI_Learning_logo.png')}
+                source={require('../../assets/adaptive-icon.png')}
                 style={styles.logo}
                 resizeMode="contain"
               />

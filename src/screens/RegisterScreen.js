@@ -253,16 +253,17 @@ const createStyles = (Colors, isDarkMode) => StyleSheet.create({
   logoContainer: {
     width: 100,
     height: 100,
-    borderRadius: 50,
-    backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.9)',
+    borderRadius: 20,
+    backgroundColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.95)',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: Spacing.md,
     overflow: 'hidden',
   },
   logo: {
-    width: 80,
-    height: 80,
+    width: 90,
+    height: 90,
+    borderRadius: 16,
   },
   title: {
     fontSize: Typography.fontSizes['2xl'],
